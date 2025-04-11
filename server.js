@@ -7,7 +7,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-
+const apikey = process.env.API; 
 // Initialize express app
 const app = express();
 const PORT = process.env.PORT || 3000;
