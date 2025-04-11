@@ -24,11 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
         "THIS ISN'T NAPTIME! ENGAGE THAT BRAIN AND FINISH THE MISSION!"
     ];
     const notificationMessages = [
-        "Stay focused, soldier!",
-        "You're doing great, keep it up!",
-        "Don't let distractions win!",
-        "Keep pushing, you're almost there!",
-        "Your task depends on your determination!"
+        "Soldier! This isn’t a vacation. You weren’t built for comfort — you were made for greatness. Laziness is the enemy.",
+        "Every second you waste, someone else gets stronger. Now get up, lock in, and do your damn duty!",
+        "You want results? Then earn them. Pain is temporary. Regret? That sticks forever.",
+        "So stand tall, focus up, and give it everything you've got. The battlefield rewards the brave — not the lazy!",
+        "Discipline isn’t optional, soldier — it’s your lifeline."
     ];
     
     // Sound setting
@@ -493,18 +493,43 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create notification element
         const notification = document.createElement('div');
         notification.classList.add('notification');
-        notification.textContent = message;
+    
+        // Add image and message to the notification
+        notification.innerHTML = `
+            <img src="C:\\Users\\venom\\Desktop\\proj\\WhatsApp Image 2025-04-11 at 17.00.54_4f1be0bc.png" class="notification-icon" alt ="Styled Image" style="border: 4px solid #3a5a36; border-radius: 10px;" width="100" height="100"/>
+            <span>${message}</span>`;
+
+            if (soundEnabled) {
+                let audio;
+                if (message.includes("Soldier! This isn’t a vacation. You weren’t built for comfort — you were made for greatness. Laziness is the enemy.") ) {
+                    audio = document.getElementById("notify-1");
+                } else if (message.includes("Every second you waste, someone else gets stronger. Now get up, lock in, and do your damn duty!") ) {
+                    audio = document.getElementById("notify-2");
+                } else if (message.includes("You want results? Then earn them. Pain is temporary. Regret? That sticks forever.") ) {
+                    audio = document.getElementById("notify-3");
+                }else if (message.includes("So stand tall, focus up, and give it everything you've got. The battlefield rewards the brave — not the lazy!") ) {
+                    audio = document.getElementById("notify-4");
+                } else if (message.includes("Discipline isn’t optional, soldier — it’s your lifeline.")) {
+                    audio = document.getElementById("notify-5");
+                }
+        
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play();
+                }
+            }
     
         // Append to body and show
         document.body.appendChild(notification);
-        setTimeout(() => notification.style.opacity = 1, 10); // Small delay to ensure transitions work
+        setTimeout(() => notification.style.opacity = 1, 10); // Small delay to trigger transition
     
         // Remove after 3 seconds
         setTimeout(() => {
             notification.style.opacity = 0;
-            setTimeout(() => notification.remove(), 500); // Remove from DOM after fading out
-        }, 3000);
+            setTimeout(() => notification.remove(), 500);
+        }, 8000);
     }
+    
     
     // Add CSS style for priority badge
     const style = document.createElement('style');

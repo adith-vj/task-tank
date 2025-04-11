@@ -797,8 +797,10 @@ main {
 /* Enhanced notification style */
 .notification {
     position: fixed;
+    gap:10px;
+    display: flex;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
     background-color: #1a2a18;
     color: #d3ffce;
     padding: 15px 20px;
@@ -809,7 +811,12 @@ main {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.3s ease, transform 0.3s ease;
-    max-width: 300px;
+    max-width: 400px;
+}
+
+.notification-icon{
+    background-color:#0a0a0a
+    
 }
 
 .notification.show {
