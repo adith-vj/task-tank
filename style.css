@@ -847,3 +847,64 @@ main {
         font-size: 2rem;
     }
 }
+/* Priority badge styles */
+.priority-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: #d3ffce;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-right: 10px;
+    text-transform: uppercase;
+}
+
+/* Task priority styling */
+.task-item[data-priority="4"] {
+    border-left: 5px solid #8a2a0a;
+}
+
+.task-item[data-priority="3"] {
+    border-left: 5px solid #5a3a30;
+}
+
+.task-item[data-priority="2"] {
+    border-left: 5px solid #3a5a36;
+}
+
+.task-item[data-priority="1"] {
+    border-left: 5px solid #2a3a28;
+}
+
+/* Priority dropdown styling */
+#task-priority {
+    padding: 12px;
+    border: 2px solid #3a5a36;
+    border-radius: 5px;
+    background-color: #0a0a0a;
+    color: #d3ffce;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#task-priority:focus {
+    outline: none;
+    border-color: #90ee90;
+    box-shadow: 0 0 5px rgba(144, 238, 144, 0.5);
+}
+
+/* Priority option colors */
+#task-priority option[value="1"] {
+    background-color: #2a3a28;
+}
+
+#task-priority option[value="2"] {
+    background-color: #3a5a36;
+}
+
+#task-priority option[value="3"] {
+    background-color: #5a3a30;
+}
+
+#task-priority option[value="4"] {
+    background-color: #8a2a0a;
+}

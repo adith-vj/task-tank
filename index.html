@@ -18,7 +18,7 @@
             </div>
             <div id="coin-balance">
                 Coins: <span id="coin-amount">0</span>
-            </div>
+            </div>  
         </div>
     </header>
 
@@ -26,6 +26,12 @@
         <div class="task-input-container">
             <form class="task-form" id="task-form">
                 <input type="text" class="task-input" id="task-input" placeholder="ENTER NEW MISSION OBJECTIVE" required>
+                <select id="task-priority" required>
+                    <option value="1">Low</option>
+                    <option value="2">Medium</option>
+                    <option value="3">High</option>
+                    <option value="4">Urgent</option>
+                </select>
                 <button type="submit" class="add-task-btn">DEPLOY</button>
             </form>
         </div>
