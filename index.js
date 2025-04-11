@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get elements
     const taskForm = document.getElementById('task-form');
     const taskInput = document.getElementById('task-input');
+    const taskPriority = document.getElementById('task-priority');
     const taskList = document.getElementById('task-list');
     const tankLockMode = document.getElementById('tank-lock-mode');
     const exitLockBtn = document.getElementById('exit-lock-btn');
@@ -46,25 +47,64 @@ document.addEventListener('DOMContentLoaded', function() {
         coinAmountDisplay.textContent = coinBalance;
     }
 
+    // Priority labels map
+    const priorityLabels = {
+        '1': 'Low',
+        '2': 'Medium',
+        '3': 'High',
+        '4': 'Urgent'
+    };
+
+    // Priority colors map
+    const priorityColors = {
+        '1': '#2a3a28',
+        '2': '#3a5a36',
+        '3': '#5a3a30',
+        '4': '#8a2a0a'
+    };
     
     // Add new task
     taskForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const taskText = taskInput.value.trim();
+        const priority = taskPriority.value;
+        
         if (taskText) {
-            addNewTask(taskText);
+            // Check if priority is urgent (4) and handle reassignment
+            if (priority === '4') {
+                // Find any existing urgent tasks and demote them to high priority
+                const urgentTasks = document.querySelectorAll('.task-item[data-priority="4"]');
+                urgentTasks.forEach(task => {
+                    task.setAttribute('data-priority', '3');
+                    const priorityBadge = task.querySelector('.priority-badge');
+                    if (priorityBadge) {
+                        priorityBadge.textContent = 'High';
+                        priorityBadge.style.backgroundColor = priorityColors['3'];
+                    }
+                });
+                
+                // Show notification about priority change
+                if (urgentTasks.length > 0) {
+                    showNotification("Previous urgent task has been downgraded to high priority");
+                }
+            }
+            
+            addNewTask(taskText, priority);
             taskInput.value = '';
+            
+            // Sort tasks by priority
+            sortTasksByPriority();
         }
     });
-
-    
     
     // Add new task function
-    function addNewTask(text) {
+    function addNewTask(text, priority) {
         const taskItem = document.createElement('div');
         taskItem.className = 'task-item';
+        taskItem.setAttribute('data-priority', priority);
         taskItem.innerHTML = `
             <div class="task-content">
+                <span class="priority-badge" style="background-color: ${priorityColors[priority]}">${priorityLabels[priority]}</span>
                 <span class="task-title">${text}</span>
             </div>
             <div class="task-actions">
@@ -86,6 +126,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add to list
         taskList.prepend(taskItem);
+        
+        // Sort tasks by priority
+        sortTasksByPriority();
+    }
+    
+    // Sort tasks by priority (highest to lowest)
+    function sortTasksByPriority() {
+        const tasks = Array.from(taskList.querySelectorAll('.task-item'));
+        
+        // Sort tasks by priority (highest to lowest)
+        tasks.sort((a, b) => {
+            const priorityA = parseInt(a.getAttribute('data-priority'));
+            const priorityB = parseInt(b.getAttribute('data-priority'));
+            return priorityB - priorityA;
+        });
+        
+        // Remove all tasks from the list
+        tasks.forEach(task => task.remove());
+        
+        // Add tasks back in the correct order
+        tasks.forEach(task => taskList.appendChild(task));
     }
     
     // Set up event listeners for existing buttons
@@ -116,14 +177,12 @@ document.addEventListener('DOMContentLoaded', function() {
         let seconds = Math.floor(Math.random() * 60);
         
         const timerElement = document.getElementById('countdown-timer');
-        timerElement.textContent =  `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
-        const tankLockMode = document.querySelector('.tank-lock-mode'); // Make sure it's defined in your HTML
+        const tankLockMode = document.querySelector('.tank-lock-mode');
         // Show Tank Lock mode
         tankLockMode.classList.add('tank-lock-active');
         
-
-
         let countdown = setInterval(() => {
             if (seconds === 0) {
                 if (minutes === 0) {
@@ -134,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 minutes--; // Decrease minutes
-                seconds = 59; // Reset seconds to 59sssssss
+                seconds = 59; // Reset seconds
             } else {
                 seconds--; // Decrease seconds
             }
@@ -151,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const randomCommand = tankCommands[Math.floor(Math.random() * tankCommands.length)];
             soundIndicator.textContent = `"${randomCommand}"`;
             soundIndicator.style.display = 'block';
-
             
             // Update commander message in Tank Lock mode
             document.querySelector('.commander-message').textContent = randomCommand;
@@ -161,8 +219,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 soundIndicator.style.display = 'none';
             }, 3000);
         }
+        
         function awardCoins() {
-            const timeSpent = Math.floor((Date.now(x) - tankLockStartTime) / 1000); // Time in seconds
+            const timeSpent = Math.floor((Date.now() - tankLockStartTime) / 1000); // Time in seconds
             const coinsEarned = Math.floor(timeSpent / 60); // 1 coin per minute
             updateCoinBalance(coinsEarned);
         
@@ -171,24 +230,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const surrenderButton = document.getElementById('surrender-btn');
-        const completeButton=document.getElementById('complete-btn');
-        const exitbutton=document.getElementById('exit-lock-btn');
+        const completeButton = document.getElementById('complete-btn');
+        const exitButton = document.getElementById('exit-lock-btn');
+        
         surrenderButton.addEventListener('click', () => {
             clearInterval(countdown); // Stop the countdown
             tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
             timerElement.textContent = "SURRENDERED"; // Optionally update timer text
             awardCoins();
         });
+        
         completeButton.addEventListener('click', () => {
             clearInterval(countdown); // Stop the countdown
             tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
-            timerElement.textContent = "SURRENDERED"; // Optionally update timer text
+            timerElement.textContent = "COMPLETED"; // Optionally update timer text
             awardCoins();
         });
-        exitbutton.addEventListener('click', () => {
+        
+        exitButton.addEventListener('click', () => {
             clearInterval(countdown); // Stop the countdown
             tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
-            timerElement.textContent = "SURRENDERED"; // Optionally update timer text
+            timerElement.textContent = "EXITED"; // Optionally update timer text
             awardCoins();
         });
     }
@@ -215,7 +277,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const reclaimBtn = wreckageItem.querySelector('.reclaim-btn');
         reclaimBtn.addEventListener('click', function() {
             wreckageItem.remove();
-            addNewTask(taskTitle);
+            // Default to medium priority when reclaiming
+            addNewTask(taskTitle, '2');
         });
         
         wreckageItems.prepend(wreckageItem);
@@ -287,6 +350,26 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             explosionContainer.style.display = 'none';
             taskItem.remove();
+            
+            // Check if there are any urgent tasks left
+            const urgentTasks = document.querySelectorAll('.task-item[data-priority="4"]');
+            if (urgentTasks.length === 0) {
+                // Optionally promote the highest priority task to urgent
+                // This is commented out as it wasn't part of requirements, but could be useful
+                /*
+                const highTasks = document.querySelectorAll('.task-item[data-priority="3"]');
+                if (highTasks.length > 0) {
+                    const firstHighTask = highTasks[0];
+                    firstHighTask.setAttribute('data-priority', '4');
+                    const priorityBadge = firstHighTask.querySelector('.priority-badge');
+                    if (priorityBadge) {
+                        priorityBadge.textContent = 'Urgent';
+                        priorityBadge.style.backgroundColor = priorityColors['4'];
+                    }
+                    showNotification("A high priority task has been promoted to urgent");
+                }
+                */
+            }
         }, 1000);
     }
     
@@ -313,11 +396,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const wreckageItem = btn.closest('.wreckage-item');
             const taskTitle = wreckageItem.querySelector('.wreckage-task-title').textContent;
             wreckageItem.remove();
-            addNewTask(taskTitle);
+            // Default to medium priority when reclaiming
+            addNewTask(taskTitle, '2');
         });
     });
-    function showNotification() {
-        const message = notificationMessages[Math.floor(Math.random() * notificationMessages.length)];
+    
+    function showNotification(customMessage) {
+        const message = customMessage || notificationMessages[Math.floor(Math.random() * notificationMessages.length)];
     
         // Create notification element
         const notification = document.createElement('div');
@@ -326,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Append to body and show
         document.body.appendChild(notification);
-        notification.style.opacity = 1;
+        setTimeout(() => notification.style.opacity = 1, 10); // Small delay to ensure transitions work
     
         // Remove after 3 seconds
         setTimeout(() => {
@@ -334,4 +419,23 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => notification.remove(), 500); // Remove from DOM after fading out
         }, 3000);
     }
+    
+    // Add CSS style for priority badge
+    const style = document.createElement('style');
+    style.textContent = `
+        .priority-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: #d3ffce;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .task-item[data-priority="4"] {
+            border-left: 5px solid #8a2a0a;
+            border-color: #8a2a0a;
+        }
+    `;
+    document.head.appendChild(style);
 });
