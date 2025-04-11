@@ -998,3 +998,366 @@ main {
 .tank-lock-mode .progress-bar {
     transition: width 0.5s ease;
 }
+
+/* Armory Shop Styles */
+.armory-shop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(10, 10, 10, 0.95);
+    z-index: 1000;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.armory-shop.show {
+    display: flex;
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 2px solid #3a5a36;
+    margin-bottom: 20px;
+}
+
+.shop-header h2 {
+    font-size: 2rem;
+    text-transform: uppercase;
+    color: #90ee90;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(144, 238, 144, 0.3);
+    margin: 0;
+}
+
+.close-shop-btn {
+    background-color: #5a3a30;
+    color: #d3ffce;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-shop-btn:hover {
+    background-color: #7a4a40;
+    transform: scale(1.1);
+}
+
+.shop-balance {
+    background-color: #1a2a18;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    text-align: center;
+    border: 2px solid #3a5a36;
+}
+
+#shop-coin-amount {
+    color: #90ee90;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+.weapons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.weapon-item {
+    background-color: #1a2a18;
+    border: 2px solid #3a5a36;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.weapon-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    border-color: #90ee90;
+}
+
+.weapon-image {
+    height: 200px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #0a0a0a;
+    position: relative;
+}
+
+.weapon-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(to top, #1a2a18, transparent);
+}
+
+.weapon-image.pistol {
+    background-image: url("/api/placeholder/280/200");
+}
+
+.weapon-image.shotgun {
+    background-image: url("/api/placeholder/280/200");
+}
+
+.weapon-image.rifle {
+    background-image: url("/api/placeholder/280/200");
+}
+
+.weapon-image.sniper {
+    background-image: url("/api/placeholder/280/200");
+}
+
+.weapon-info {
+    padding: 15px;
+    flex: 1;
+}
+
+.weapon-info h3 {
+    margin-top: 0;
+    color: #90ee90;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.weapon-info p {
+    color: #d3ffce;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.weapon-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d3ffce;
+}
+
+.buy-btn {
+    background-color: #3a5a36;
+    color: #d3ffce;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.buy-btn:hover {
+    background-color: #90ee90;
+    color: #0a0a0a;
+}
+
+.buy-btn.disabled {
+    background-color: #2a3a28;
+    color: #6a8a66;
+    cursor: not-allowed;
+}
+
+.inventory-section {
+    background-color: #1a2a18;
+    border-radius: 10px;
+    padding: 20px;
+    border: 2px solid #3a5a36;
+}
+
+.inventory-section h3 {
+    margin-top: 0;
+    color: #90ee90;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
+.inventory-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.empty-inventory {
+    color: #6a8a66;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+.inventory-weapon {
+    background-color: #0a0a0a;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #3a5a36;
+}
+
+.inventory-weapon-image {
+    height: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 10px;
+}
+
+.inventory-weapon-image.pistol {
+    background-image: url("/api/placeholder/150/80");
+}
+
+.inventory-weapon-image.shotgun {
+    background-image: url("/api/placeholder/150/80");
+}
+
+.inventory-weapon-image.rifle {
+    background-image: url("/api/placeholder/150/80");
+}
+
+.inventory-weapon-image.sniper {
+    background-image: url("/api/placeholder/150/80");
+}
+
+.inventory-weapon-name {
+    font-size: 0.9rem;
+    color: #d3ffce;
+    font-weight: bold;
+}
+
+.purchase-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(10, 10, 10, 0.9);
+    border: 3px solid #90ee90;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    z-index: 2000;
+    animation: fadeInOut 2s forwards;
+}
+
+.purchase-notification h3 {
+    color: #90ee90;
+    font-size: 1.8rem;
+    margin-top: 0;
+    text-transform: uppercase;
+}
+
+.purchase-notification p {
+    color: #d3ffce;
+    font-size: 1.2rem;
+    margin: 15px 0;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@media (max-width: 768px) {
+    .weapons-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .inventory-items {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+/* Weapon images styling */
+.weapon-image {
+    height: 120px; /* Maintaining original box height */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.weapon-image img {
+    max-width: 70%; /* Reduced from 90% to 70% */
+    max-height: 70%; /* Reduced from 90% to 70% */
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+/* Hover effects for weapon images */
+.weapon-item:hover .weapon-image img {
+    transform: scale(1.1);
+}
+
+/* Inventory weapon images (smaller) */
+.inventory-items .weapon-image {
+    height: 80px; /* Maintaining original inventory box height */
+    width: 80px;
+    margin: 0 auto 5px;
+}
+
+.inventory-items .weapon-image img {
+    max-width: 65%; /* Smaller images in inventory */
+    max-height: 65%;
+}
+
+/* Making the weapons grid look better */
+.weapons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Original size */
+    gap: 20px;
+    padding: 15px;
+}
+
+.weapon-item {
+    background-color: rgba(30, 40, 50, 0.7);
+    border: 2px solid rgba(100, 150, 200, 0.5);
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.weapon-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 100, 255, 0.3);
+    border-color: rgba(100, 150, 200, 0.8);
+}
+
+/* Selected/owned weapon highlight */
+.weapon-item.owned {
+    border-color: rgba(100, 255, 100, 0.8);
+    background-color: rgba(30, 50, 30, 0.7);
+}
+
+.weapon-item.selected {
+    border-color: rgba(255, 200, 0, 0.8);
+    background-color: rgba(50, 40, 20, 0.7);
+}

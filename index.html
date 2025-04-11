@@ -15,6 +15,7 @@
             <div class="user-controls">
                 <button id="toggle-sound-btn">SOUND: ON</button>
                 <button id="show-stats-btn">MISSION STATS</button>
+                <button id="show-shop-btn">ARMORY</button>
             </div>
             <div id="coin-balance">
                 Coins: <span id="coin-amount">0</span>
@@ -23,6 +24,69 @@
     </header>
 
     <main>
+        <!-- Armory Shop Section -->
+<div class="armory-shop" id="armory-shop">
+    <div class="shop-header">
+        <h2>ARMORY</h2>
+        <button class="close-shop-btn" id="close-shop-btn">X</button>
+    </div>
+    <div class="shop-balance">
+        Available Coins: <span id="shop-coin-amount">0</span>
+    </div>
+    <div class="weapons-grid">
+        <div class="weapon-item" data-weapon="pistol" data-price="50">
+            <div class="weapon-image pistol">
+                <img src="asset_images\pistol.png">
+
+            </div>
+            <div class="weapon-info">
+                <h3>Combat Pistol</h3>
+                <p>Basic sidearm for quick task elimination</p>
+                <div class="weapon-price">50 coins</div>
+            </div>
+            <button class="buy-btn">PURCHASE</button>
+        </div>
+        <div class="weapon-item" data-weapon="shotgun" data-price="100">
+            <div class="weapon-image shotgun">
+                <img src="asset_images\shotgun.png">
+            </div>
+            <div class="weapon-info">
+                <h3>Tactical Shotgun</h3>
+                <p>Blast through multiple tasks at once</p>
+                <div class="weapon-price">100 coins</div>
+            </div>
+            <button class="buy-btn">PURCHASE</button>
+        </div>
+        <div class="weapon-item" data-weapon="rifle" data-price="200">
+            <div class="weapon-image rifle">
+                <img src="asset_images\rifle.png">
+            </div>
+            <div class="weapon-info">
+                <h3>Battle Rifle</h3>
+                <p>Reliable firepower for sustained productivity</p>
+                <div class="weapon-price">200 coins</div>
+            </div>
+            <button class="buy-btn">PURCHASE</button>
+        </div>
+        <div class="weapon-item" data-weapon="sniper" data-price="300">
+            <div class="weapon-image sniper">
+                <img src="asset_images\sniper.png">
+            </div>
+            <div class="weapon-info">
+                <h3>Precision Sniper</h3>
+                <p>Take out high-priority objectives with precision</p>
+                <div class="weapon-price">300 coins</div>
+            </div>
+            <button class="buy-btn">PURCHASE</button>
+        </div>
+    </div>
+    <div class="inventory-section">
+        <h3>YOUR ARSENAL</h3>
+        <div class="inventory-items" id="inventory-items">
+            <div class="empty-inventory">No weapons acquired yet. Complete missions to earn coins!</div>
+        </div>
+    </div>
+</div>
         <div class="task-input-container">
             <form class="task-form" id="task-form">
                 <input type="text" class="task-input" id="task-input" placeholder="ENTER NEW MISSION OBJECTIVE" required>
