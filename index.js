@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const explosionContainer = document.getElementById('explosion-container');
     const soundIndicator = document.getElementById('sound-indicator');
     const toggleSoundBtn = document.getElementById('toggle-sound-btn');
-    
+    let isnotificationdisplayed=true;
     // Demo commands array
     const tankCommands = [
         "MOVE IT, PRIVATE! THIS TASK ISN'T GOING TO COMPLETE ITSELF!",
@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tankLockMode.classList.add('tank-lock-active');
 
         setupSubtaskListeners();
+
         
         let countdown = setInterval(() => {
             if (seconds === 0) {
@@ -207,7 +208,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             // Update the timer display
             timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            if (Math.random() < 0.2) { // ~20% chance per second
+            if (Math.random() < 0.2 && isnotificationdisplayed==true) { // ~20% chance per second
+                isnotificationdisplayed=false;
                 showNotification();
             }
         }, 1000); // Update every second
@@ -523,6 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     audio.currentTime = 0;
                     audio.play();
                 }
+
             }
     
         // Append to body and show
@@ -532,8 +535,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Remove after 3 seconds
         setTimeout(() => {
             notification.style.opacity = 0;
+            isnotificationdisplayed= true;
             setTimeout(() => notification.remove(), 500);
-        }, 8000);
+        }, 9000);
     }
     
     
