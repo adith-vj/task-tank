@@ -555,4 +555,135 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
+    // Add this code to your existing DOMContentLoaded event listener
+const showShopBtn = document.getElementById('show-shop-btn');
+const closeShopBtn = document.getElementById('close-shop-btn');
+const armoryShop = document.getElementById('armory-shop');
+const shopCoinAmount = document.getElementById('shop-coin-amount');
+const inventoryItems = document.getElementById('inventory-items');
+
+// Initialize inventory from localStorage or create empty one
+let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+// Show shop
+showShopBtn.addEventListener('click', function() {
+    armoryShop.classList.add('show');
+    shopCoinAmount.textContent = coinBalance;
+    updateBuyButtons();
+    renderInventory();
+});
+
+// Close shop
+closeShopBtn.addEventListener('click', function() {
+    armoryShop.classList.remove('show');
+});
+
+// Setup buy buttons
+document.querySelectorAll('.buy-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const weaponItem = this.closest('.weapon-item');
+        const weaponType = weaponItem.getAttribute('data-weapon');
+        const weaponPrice = parseInt(weaponItem.getAttribute('data-price'));
+        
+        // Check if user has enough coins
+        if (coinBalance >= weaponPrice) {
+            // Check if weapon is already in inventory
+            if (!inventory.includes(weaponType)) {
+                // Deduct coins
+                updateCoinBalance(-weaponPrice);
+                shopCoinAmount.textContent = coinBalance;
+                
+                // Add to inventory
+                inventory.push(weaponType);
+                localStorage.setItem('inventory', JSON.stringify(inventory));
+                
+                // Show purchase notification
+                showPurchaseNotification(weaponType);
+                
+                // Render updated inventory
+                renderInventory();
+                
+                // Update buy buttons state
+                updateBuyButtons();
+            } else {
+                showNotification("You already own this weapon!");
+            }
+        } else {
+            showNotification("Not enough coins! Complete more tasks to earn coins.");
+        }
+    });
+});
+
+// Update buy buttons based on coin balance and inventory
+function updateBuyButtons() {
+    document.querySelectorAll('.weapon-item').forEach(item => {
+        const weaponType = item.getAttribute('data-weapon');
+        const weaponPrice = parseInt(item.getAttribute('data-price'));
+        const buyBtn = item.querySelector('.buy-btn');
+        
+        // Disable if not enough coins or already owned
+        if (coinBalance < weaponPrice || inventory.includes(weaponType)) {
+            buyBtn.classList.add('disabled');
+            buyBtn.textContent = inventory.includes(weaponType) ? "OWNED" : "INSUFFICIENT FUNDS";
+        } else {
+            buyBtn.classList.remove('disabled');
+            buyBtn.textContent = "PURCHASE";
+        }
+    });
+}
+
+// Render inventory items
+function renderInventory() {
+    // Clear inventory display
+    inventoryItems.innerHTML = '';
+    
+    // Show empty message if inventory is empty
+    if (inventory.length === 0) {
+        inventoryItems.innerHTML = '<div class="empty-inventory">No weapons acquired yet. Complete missions to earn coins!</div>';
+        return;
+    }
+    
+    // Map of weapon types to display names
+    const weaponNames = {
+        'pistol': 'Combat Pistol',
+        'shotgun': 'Tactical Shotgun',
+        'rifle': 'Battle Rifle',
+        'sniper': 'Precision Sniper'
+    };
+    
+    // Add each weapon to inventory display
+    inventory.forEach(weaponType => {
+        const weaponElement = document.createElement('div');
+        weaponElement.className = 'inventory-weapon';
+        weaponElement.innerHTML = `
+            <div class="inventory-weapon-image ${weaponType}"></div>
+            <div class="inventory-weapon-name">${weaponNames[weaponType]}</div>
+        `;
+        inventoryItems.appendChild(weaponElement);
+    });
+}
+
+// Show purchase notification
+function showPurchaseNotification(weaponType) {
+    const weaponNames = {
+        'pistol': 'Combat Pistol',
+        'shotgun': 'Tactical Shotgun',
+        'rifle': 'Battle Rifle',
+        'sniper': 'Precision Sniper'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = 'purchase-notification';
+    notification.innerHTML = `
+        <h3>WEAPON ACQUIRED</h3>
+        <p>You have successfully purchased the ${weaponNames[weaponType]}!</p>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after animation completes
+    setTimeout(() => {
+        notification.remove();
+    }, 2000);
+}
 });
