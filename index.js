@@ -170,7 +170,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update focused task title
         document.querySelector('.focused-task-title').textContent = taskTitle;
 
+        generateSubtasks(taskTitle);
+        
+
         let tankLockStartTime = Date.now();
+
         
         // Show random timer (between 10-20 minutes)
         let minutes = Math.floor(Math.random() * 10) + 10;
@@ -182,6 +186,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const tankLockMode = document.querySelector('.tank-lock-mode');
         // Show Tank Lock mode
         tankLockMode.classList.add('tank-lock-active');
+
+        setupSubtaskListeners();
         
         let countdown = setInterval(() => {
             if (seconds === 0) {
@@ -252,6 +258,86 @@ document.addEventListener('DOMContentLoaded', function() {
             tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
             timerElement.textContent = "EXITED"; // Optionally update timer text
             awardCoins();
+        });
+    }
+    function generateSubtasks(taskTitle) {
+        // Default subtasks based on task patterns
+        const defaultSubtasks = {
+            "report": [
+                "Research and gather information",
+                "Create outline and structure",
+                "Write main content sections",
+                "Review and finalize"
+            ],
+            "presentation": [
+                "Research relevant content and gather materials",
+                "Create slide templates and outline structure",
+                "Add content to slides with visuals and charts",
+                "Review, proofread and finalize presentation"
+            ],
+            "project": [
+                "Define project scope and requirements",
+                "Create project timeline and milestones",
+                "Execute core project components",
+                "Test and finalize deliverables"
+            ],
+            "default": [
+                "Plan and organize task requirements",
+                "Create initial draft or structure",
+                "Develop core components",
+                "Review and finalize"
+            ]
+        };
+        
+        // Determine which set of subtasks to use based on the task title
+        let subtasks = defaultSubtasks.default;
+        for (const [key, value] of Object.entries(defaultSubtasks)) {
+            if (taskTitle.toLowerCase().includes(key)) {
+                subtasks = value;
+                break;
+            }
+        }
+        
+        // Get the subtasks container
+        const subtasksList = document.getElementById('focused-subtasks');
+        subtasksList.innerHTML = ''; // Clear existing subtasks
+        
+        // Create the subtasks
+        subtasks.forEach((subtask, index) => {
+            const subtaskItem = document.createElement('div');
+            subtaskItem.className = 'subtask-item';
+            subtaskItem.innerHTML = `
+                <input type="checkbox" id="subtask-${index+1}" class="subtask-checkbox">
+                <label for="subtask-${index+1}">${subtask}</label>
+            `;
+            subtasksList.appendChild(subtaskItem);
+        });
+        
+        // Reset progress bar
+        document.querySelector('.progress-bar').style.width = '0%';
+    }
+    
+    // Function to set up event listeners for subtasks
+    function setupSubtaskListeners() {
+        const subtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
+        const progressBar = document.querySelector('.progress-bar');
+        
+        subtaskCheckboxes.forEach(checkbox => {
+            checkbox.checked = false; // Reset all checkboxes
+            checkbox.addEventListener('change', () => {
+                // Calculate progress based on checked subtasks
+                const totalSubtasks = subtaskCheckboxes.length;
+                const completedSubtasks = Array.from(subtaskCheckboxes).filter(cb => cb.checked).length;
+                const progressPercentage = (completedSubtasks / totalSubtasks) * 100;
+                
+                // Update progress bar
+                progressBar.style.width = `${progressPercentage}%`;
+                
+                // If all subtasks are completed, suggest completing the task
+                if (completedSubtasks === totalSubtasks) {
+                    showNotification("All objectives completed! Ready to finish the mission!");
+                }
+            });
         });
     }
     
