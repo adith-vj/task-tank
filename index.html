@@ -19,8 +19,6 @@
             <div id="coin-balance">
                 Coins: <span id="coin-amount">0</span>
             </div>
-
-            
         </div>
     </header>
 
@@ -33,49 +31,13 @@
         </div>
 
         <div class="task-list-container" id="task-list">
-            <!-- Example task items -->
-            <div class="task-item">
-                <div class="task-content">
-                    <span class="task-title">Complete project presentation</span>
-                </div>
-                <div class="task-actions">
-                    <button class="task-btn">TANK LOCK</button>
-                    <button class="task-btn destroy-btn">DESTROY</button>
-                </div>
-            </div>
-            
-            <div class="task-item">
-                <div class="task-content">
-                    <span class="task-title">Review code for bugs</span>
-                </div>
-                <div class="task-actions">
-                    <button class="task-btn">TANK LOCK</button>
-                    <button class="task-btn destroy-btn">DESTROY</button>
-                </div>
-            </div>
-            
-            <div class="task-item">
-                <div class="task-content">
-                    <span class="task-title">Send weekly report to team</span>
-                </div>
-                <div class="task-actions">
-                    <button class="task-btn">TANK LOCK</button>
-                    <button class="task-btn destroy-btn">DESTROY</button>
-                </div>
-            </div>
+            <!-- Tasks will be added here dynamically -->
         </div>
 
         <div class="wreckage-pile">
-            <h3 class="wreckage-title"> WRECKAGE PILE</h3>
+            <h3 class="wreckage-title">WRECKAGE PILE</h3>
             <div class="wreckage-items">
-                <div class="wreckage-item">
-                    <span class="wreckage-task-title">Update project timeline</span>
-                    <button class="reclaim-btn">SALVAGE</button>
-                </div>
-                <div class="wreckage-item">
-                    <span class="wreckage-task-title">Schedule team meeting</span>
-                    <button class="reclaim-btn">SALVAGE</button>
-                </div>
+                <!-- Failed tasks will be added here dynamically -->
             </div>
         </div>
     </main>
@@ -83,7 +45,7 @@
     <!-- Tank Lock Mode (Full Screen Focus Mode) -->
     <div class="tank-lock-mode" id="tank-lock-mode">
         <div class="tank-lock-header">
-            <div class="tank-lock-title"> TANK LOCK ENGAGED</div>
+            <div class="tank-lock-title">TANK LOCK ENGAGED</div>
             <button class="exit-lock-btn" id="exit-lock-btn">SURRENDER</button>
         </div>
         
@@ -96,6 +58,9 @@
             <div class="commander-message">
                 FOCUS, SOLDIER! THIS TASK WON'T COMPLETE ITSELF!
             </div>
+            
+            <!-- Subtasks will be added here -->
+            
             <div class="task-controls">
                 <button class="complete-btn" id="complete-btn">MISSION COMPLETE</button>
                 <button class="surrender-btn" id="surrender-btn">SURRENDER</button>
@@ -115,6 +80,8 @@
         "FOCUS, SOLDIER! THIS TASK WON'T COMPLETE ITSELF!"
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@latest"></script>
     <script src="index.js"></script>
 </body>
 </html>

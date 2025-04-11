@@ -1,0 +1,28 @@
+{
+  "name": "task-tank",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adith-vj/task-tank.git"
+  },
+  "author": "Amogh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adith-vj/task-tank/issues"
+  },
+  "homepage": "https://github.com/adith-vj/task-tank#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "nodemon": "^3.1.9",
+    "path-to-regexp": "^6.1.0",
+    "uuid": "^11.1.0"
+  }
+}
