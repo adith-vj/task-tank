@@ -521,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Append to body and show
         document.body.appendChild(notification);
-        setTimeout(() => notification.style.opacity = 1, 10); // Small delay to trigger transition
+        setTimeout(() => notification.style.opacity = 7, 10); // Small delay to trigger transition
     
         // Remove after 3 seconds
         setTimeout(() => {
