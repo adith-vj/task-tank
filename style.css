@@ -480,6 +480,40 @@ main {
     text-decoration: line-through;
 }
 
+.command-line {
+    display: flex;
+    max-width: 700px;
+    gap:10px;
+    background-color: #1a2a18;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    border: 2px solid #3a5a36;
+    overflow:hidden;
+    white-space: nowrap;
+    animation:typing 4s steps(150) forwards;
+}
+
+.command-line-col{
+    background-color:#0a0a0a
+}
+
+.command-line-title {
+    color: #6a8a66;
+    overflow:hidden;
+    white-space: nowrap;
+    animation:typing 4s steps(40) forwards;
+}
+
+@keyframes typing {
+    from{
+        width:0;
+    }
+    to{
+        width:100%;    
+    }
+  }
+
 .reclaim-btn {
     background-color: #5a3a30;
     color: #d3ffce;
