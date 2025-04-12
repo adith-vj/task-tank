@@ -3,7 +3,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'tt')));
+app.use(express.static(__dirname));
 
 // Debug Logger
 app.use((req, res, next) => {
@@ -30,19 +30,7 @@ let completedTasks = [];
 let wreckageTasks = [];
 
 // Initialize Gemini API
-let genAI = null;
 
-function initializeGenAI(apiKey) {
-    if (!apiKey) return false;
-
-    try {
-    genAI = new GoogleGenerativeAI(apiKey);
-    return true;
-    } catch (error) {
-    console.error("Failed to initialize Gemini API:", error);
-    return false;
-    }
-}
 
 // New route to handle `/api/tasks`
 app.get('/api/tasks', (req, res) => {
@@ -122,63 +110,175 @@ app.post('/api/wreckage/:id/salvage', (req, res) => {
     res.json(salvageTask);
 });
 
-// Generate subtasks using Gemini
-app.post('/api/tasks/:id/generate-subtasks', async (req, res) => {
-    const { apiKey } = req.body;
-    const taskId = req.params.id;
+// Generate subtasks using Groq
+app.post('/api/generate-subtasks', async (req, res) => {
+    const { taskTitle } = req.body;
 
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) return res.status(404).json({ error: 'Task not found' });
-
-    if (!genAI && !initializeGenAI(apiKey)) {
+    if (!apikey) {
         return res.status(400).json({ error: 'Invalid or missing API key' });
     }
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apikey}`
+            },
+            body: JSON.stringify({
+                model: "mixtral-8x7b-32768",
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are a task management assistant that breaks down tasks into specific, actionable subtasks. Always respond with a JSON array of exactly 4 strings."
+                    },
+                    {
+                        role: "user",
+                        content: `Break down the following task into exactly 4 specific, actionable subtasks. Make each subtask concrete, measurable, and unique to this task.
 
-    const prompt = `
-        Break down the following task into 3-5 clear, actionable subtasks:
-        Task: "${task.title}"
-        
-        Please provide only the list of subtasks, with each subtask being specific and achievable.
-        Format the response as a JSON array with each subtask as a string.
-    `;
+Task: "${taskTitle}"
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+Requirements:
+1. Each subtask must be specific to this exact task
+2. Subtasks must be in logical order of completion
+3. Each subtask should represent about 25% of the total work
+4. Avoid generic terms like "research" or "plan"
+5. Include specific details relevant to this task
+6. Make each subtask actionable and measurable
 
-    let subtasks = [];
-    try {
-        const jsonMatch = text.match(/\[.*\]/s);
-        if (jsonMatch) {
-        subtasks = JSON.parse(jsonMatch[0]);
-        } else {
-            subtasks = text.split('\n')
-            .filter(line => line.trim().length > 0)
-            .map(line => line.replace(/^\d+\.\s*/, '').trim());
+Format your response as a JSON array with exactly 4 strings, like this:
+["Specific action 1", "Specific action 2", "Specific action 3", "Specific action 4"]`
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 500
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Groq API error: ${response.statusText}`);
         }
-    } catch (e) {
-        console.error("Failed to parse Gemini response:", e);
-        subtasks = ["Break down task", "Work on components", "Review and finalize"];
-    }
 
-    task.subtasks = subtasks.map(title => ({
-        id: uuidv4(),
-        title,
-        completed: false
-    }));
+        const data = await response.json();
+        const content = data.choices[0].message.content;
 
-    res.json(task);
+        let subtasks = [];
+        try {
+            // Try to parse the response as JSON
+            const jsonMatch = content.match(/\[.*\]/s);
+            if (jsonMatch) {
+                subtasks = JSON.parse(jsonMatch[0]);
+            } else {
+                // If not JSON, try to parse as text
+                subtasks = content.split('\n')
+                    .filter(line => line.trim().length > 0)
+                    .map(line => line.replace(/^\d+\.\s*/, '').trim())
+                    .slice(0, 4); // Take only first 4 lines
+            }
+
+            // Ensure we have exactly 4 subtasks
+            if (subtasks.length !== 4) {
+                throw new Error('Did not receive exactly 4 subtasks');
+            }
+
+            // Validate and clean each subtask
+            subtasks = subtasks.map(task => {
+                if (typeof task !== 'string') {
+                    throw new Error('Invalid subtask format');
+                }
+                return task.trim();
+            });
+
+        } catch (e) {
+            console.error("Failed to parse Groq response:", e);
+            // Fallback to context-specific default subtasks
+            const defaultSubtasks = {
+                "report": [
+                    "Gather and analyze relevant data sources",
+                    "Create detailed outline with main sections",
+                    "Write and refine content for each section",
+                    "Proofread and format final document"
+                ],
+                "presentation": [
+                    "Research and collect supporting materials",
+                    "Design slide layout and visual elements",
+                    "Create content for each slide",
+                    "Practice and refine delivery"
+                ],
+                "project": [
+                    "Define project scope and deliverables",
+                    "Create implementation timeline",
+                    "Execute core project components",
+                    "Test and document results"
+                ],
+                "study": [
+                    "Review course materials and notes",
+                    "Create study guide with key concepts",
+                    "Practice with sample questions",
+                    "Review weak areas and final preparation"
+                ],
+                "meeting": [
+                    "Prepare agenda and materials",
+                    "Review previous meeting notes",
+                    "Set up meeting space and technology",
+                    "Document action items and follow-ups"
+                ],
+                "email": [
+                    "Draft initial message content",
+                    "Review and edit for clarity",
+                    "Add attachments and formatting",
+                    "Final proofread and send"
+                ],
+                "code": [
+                    "Plan architecture and design",
+                    "Implement core functionality",
+                    "Add user interface elements",
+                    "Test and debug code"
+                ],
+                "default": [
+                    `Research and gather information about ${taskTitle}`,
+                    `Create initial structure for ${taskTitle}`,
+                    `Develop core components of ${taskTitle}`,
+                    `Review and finalize ${taskTitle}`
+                ]
+            };
+
+            // Determine which set of subtasks to use based on task title
+            const lowerTitle = taskTitle.toLowerCase();
+            if (lowerTitle.includes("report") || lowerTitle.includes("write up") || lowerTitle.includes("document")) {
+                subtasks = defaultSubtasks.report;
+            } else if (lowerTitle.includes("presentation") || lowerTitle.includes("slide") || lowerTitle.includes("pitch")) {
+                subtasks = defaultSubtasks.presentation;
+            } else if (lowerTitle.includes("project") || lowerTitle.includes("assignment") || lowerTitle.includes("task")) {
+                subtasks = defaultSubtasks.project;
+            } else if (lowerTitle.includes("study") || lowerTitle.includes("learn") || lowerTitle.includes("review")) {
+                subtasks = defaultSubtasks.study;
+            } else if (lowerTitle.includes("meeting") || lowerTitle.includes("call") || lowerTitle.includes("discussion")) {
+                subtasks = defaultSubtasks.meeting;
+            } else if (lowerTitle.includes("email") || lowerTitle.includes("message") || lowerTitle.includes("correspondence")) {
+                subtasks = defaultSubtasks.email;
+            } else if (lowerTitle.includes("code") || lowerTitle.includes("program") || lowerTitle.includes("develop")) {
+                subtasks = defaultSubtasks.code;
+            } else {
+                subtasks = defaultSubtasks.default;
+            }
+        }
+
+        res.json({
+            subtasks: subtasks.map(title => ({
+                id: uuidv4(),
+                title,
+                completed: false
+            }))
+        });
     } catch (error) {
         console.error("Error generating subtasks:", error);
         res.status(500).json({
-        error: 'Failed to generate subtasks', // fixed typo here
-        details: error.message
+            error: 'Failed to generate subtasks',
+            details: error.message
         });
     }
-    });
+});
 
 // Update subtask status
 app.patch('/api/tasks/:taskId/subtasks/:subtaskId', (req, res) => {

@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
         "THIS ISN'T NAPTIME! ENGAGE THAT BRAIN AND FINISH THE MISSION!"
     ];
     const notificationMessages = [
-        "Soldier! This isn’t a vacation. You weren’t built for comfort — you were made for greatness. Laziness is the enemy.",
+        "Soldier! This isn't a vacation. You weren't built for comfort — you were made for greatness. Laziness is the enemy.",
         "Every second you waste, someone else gets stronger. Now get up, lock in, and do your damn duty!",
         "You want results? Then earn them. Pain is temporary. Regret? That sticks forever.",
         "So stand tall, focus up, and give it everything you've got. The battlefield rewards the brave — not the lazy!",
-        "Discipline isn’t optional, soldier — it’s your lifeline.",
+        "Discipline isn't optional, soldier — it's your lifeline.",
         "While you sit and wait, others are grinding, winning, rising.",
-        "Hell no. It’s earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!"
+        "Hell no. It's earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!"
     ];
     
     // Sound setting
@@ -172,11 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update focused task title
         document.querySelector('.focused-task-title').textContent = taskTitle;
 
+        // Generate and display subtasks
         generateSubtasks(taskTitle);
-        
 
         let tankLockStartTime = Date.now();
-
         
         // Show random timer (between 10-20 minutes)
         let minutes = Math.floor(Math.random() * 10) + 10;
@@ -185,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const timerElement = document.getElementById('countdown-timer');
         timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
-        const tankLockMode = document.querySelector('.tank-lock-mode');
+        const tankLockMode = document.getElementById('tank-lock-mode');
         // Show Tank Lock mode
         tankLockMode.classList.add('tank-lock-active');
 
@@ -195,25 +194,22 @@ document.addEventListener('DOMContentLoaded', function() {
         let countdown = setInterval(() => {
             if (seconds === 0) {
                 if (minutes === 0) {
-                    clearInterval(countdown); // Stop the timer
-                    timerElement.textContent = "00:00"; // Display "Time's up" message
-                    // Optionally trigger a task completion or alert
+                    clearInterval(countdown);
+                    timerElement.textContent = "00:00";
                     alert("Time's up! Tank Lock mode complete!");
                     return;
                 }
-                minutes--; // Decrease minutes
-                seconds = 59; // Reset seconds
+                minutes--;
+                seconds = 59;
             } else {
-                seconds--; // Decrease seconds
+                seconds--;
             }
-            // Update the timer display
             timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            if (Math.random() < 0.2 && isnotificationdisplayed==true) { // ~20% chance per second
-                isnotificationdisplayed=false;
+            
+            if (Math.random() < 0.2) {
                 showNotification();
             }
-        }, 1000); // Update every second
-    
+        }, 1000);
         
         // Play random command
         if (soundEnabled) {
@@ -230,96 +226,122 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
         }
         
-        function awardCoins() {
-            const timeSpent = Math.floor((Date.now() - tankLockStartTime) / 1000); // Time in seconds
-            const coinsEarned = Math.floor(timeSpent / 60); // 1 coin per minute
-            updateCoinBalance(coinsEarned);
+        // Set up event listeners for Tank Lock controls
+        const exitLockBtn = document.getElementById('exit-lock-btn');
+        const completeBtn = document.getElementById('complete-btn');
+        const surrenderBtn = document.getElementById('surrender-btn');
         
-            // Notify the user
-            alert(`You earned ${coinsEarned} coins for working ${Math.floor(timeSpent / 60)} minutes!`);
-            enterTankLock.remove();
-        }
-        
-        const surrenderButton = document.getElementById('surrender-btn');
-        const completeButton = document.getElementById('complete-btn');
-        const exitButton = document.getElementById('exit-lock-btn');
-        
-        surrenderButton.addEventListener('click', () => {
-            clearInterval(countdown); // Stop the countdown
-            tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
-            timerElement.textContent = "SURRENDERED"; // Optionally update timer text
+        exitLockBtn.addEventListener('click', () => {
+            clearInterval(countdown);
+            tankLockMode.classList.remove('tank-lock-active');
             awardCoins();
         });
         
-        completeButton.addEventListener('click', () => {
-            clearInterval(countdown); // Stop the countdown
-            tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
-            timerElement.textContent = "COMPLETED"; // Optionally update timer text
+        completeBtn.addEventListener('click', () => {
+            clearInterval(countdown);
+            tankLockMode.classList.remove('tank-lock-active');
             awardCoins();
+            // Show explosion animation
+            explosionContainer.style.display = 'flex';
+            setTimeout(() => {
+                explosionContainer.style.display = 'none';
+            }, 1000);
         });
         
-        exitButton.addEventListener('click', () => {
-            clearInterval(countdown); // Stop the countdown
-            tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
-            timerElement.textContent = "EXITED"; // Optionally update timer text
-            awardCoins();
+        surrenderBtn.addEventListener('click', () => {
+            clearInterval(countdown);
+            tankLockMode.classList.remove('tank-lock-active');
+            // Add task to wreckage pile
+            const wreckageItems = document.querySelector('.wreckage-items');
+            const wreckageItem = document.createElement('div');
+            wreckageItem.className = 'wreckage-item';
+            wreckageItem.innerHTML = `
+                <span class="wreckage-task-title">${taskTitle}</span>
+                <button class="reclaim-btn">SALVAGE</button>
+            `;
+            wreckageItems.appendChild(wreckageItem);
         });
     }
+    
+    // Generate subtasks for a task
     function generateSubtasks(taskTitle) {
-        // Default subtasks based on task patterns
-        const defaultSubtasks = {
-            "report": [
-                "Research and gather information",
-                "Create outline and structure",
-                "Write main content sections",
-                "Review and finalize"
-            ],
-            "presentation": [
-                "Research relevant content and gather materials",
-                "Create slide templates and outline structure",
-                "Add content to slides with visuals and charts",
-                "Review, proofread and finalize presentation"
-            ],
-            "project": [
-                "Define project scope and requirements",
-                "Create project timeline and milestones",
-                "Execute core project components",
-                "Test and finalize deliverables"
-            ],
-            "default": [
-                "Plan and organize task requirements",
-                "Create initial draft or structure",
-                "Develop core components",
-                "Review and finalize"
-            ]
-        };
-        
-        // Determine which set of subtasks to use based on the task title
-        let subtasks = defaultSubtasks.default;
-        for (const [key, value] of Object.entries(defaultSubtasks)) {
-            if (taskTitle.toLowerCase().includes(key)) {
-                subtasks = value;
-                break;
-            }
-        }
-        
         // Get the subtasks container
         const subtasksList = document.getElementById('focused-subtasks');
         subtasksList.innerHTML = ''; // Clear existing subtasks
         
-        // Create the subtasks
-        subtasks.forEach((subtask, index) => {
-            const subtaskItem = document.createElement('div');
-            subtaskItem.className = 'subtask-item';
-            subtaskItem.innerHTML = `
-                <input type="checkbox" id="subtask-${index+1}" class="subtask-checkbox">
-                <label for="subtask-${index+1}">${subtask}</label>
-            `;
-            subtasksList.appendChild(subtaskItem);
-        });
+        // Show loading state
+        subtasksList.innerHTML = '<div class="loading">Generating subtasks...</div>';
         
-        // Reset progress bar
-        document.querySelector('.progress-bar').style.width = '0%';
+        // Make API call to generate subtasks
+        fetch('/api/generate-subtasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                taskTitle: taskTitle
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to generate subtasks');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            // Clear loading state
+            subtasksList.innerHTML = '';
+            
+            // Create the subtasks
+            data.subtasks.forEach((subtask, index) => {
+                const subtaskItem = document.createElement('div');
+                subtaskItem.className = 'subtask-item';
+                subtaskItem.innerHTML = `
+                    <input type="checkbox" id="subtask-${index+1}" class="subtask-checkbox">
+                    <label for="subtask-${index+1}">${subtask.title}</label>
+                `;
+                subtasksList.appendChild(subtaskItem);
+            });
+            
+            // Reset progress bar
+            document.querySelector('.progress-bar').style.width = '0%';
+            
+            // Set up event listeners for the new subtasks
+            setupSubtaskListeners();
+        })
+        .catch(error => {
+            console.error('Error generating subtasks:', error);
+            // Clear loading state
+            subtasksList.innerHTML = '';
+            
+            // Fallback to default subtasks
+            const defaultSubtasks = [
+                `Research and gather information about ${taskTitle}`,
+                `Create initial structure for ${taskTitle}`,
+                `Develop core components of ${taskTitle}`,
+                `Review and finalize ${taskTitle}`
+            ];
+            
+            defaultSubtasks.forEach((subtask, index) => {
+                const subtaskItem = document.createElement('div');
+                subtaskItem.className = 'subtask-item';
+                subtaskItem.innerHTML = `
+                    <input type="checkbox" id="subtask-${index+1}" class="subtask-checkbox">
+                    <label for="subtask-${index+1}">${subtask}</label>
+                `;
+                subtasksList.appendChild(subtaskItem);
+            });
+            
+            // Reset progress bar
+            document.querySelector('.progress-bar').style.width = '0%';
+            
+            // Set up event listeners for the default subtasks
+            setupSubtaskListeners();
+        });
     }
     
     // Function to set up event listeners for subtasks
@@ -506,7 +528,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (soundEnabled) {
                 let audio;
-                if (message.includes("Soldier! This isn’t a vacation. You weren’t built for comfort — you were made for greatness. Laziness is the enemy.") ) {
+                if (message.includes("Soldier! This isn't a vacation. You weren't built for comfort — you were made for greatness. Laziness is the enemy.") ) {
                     audio = document.getElementById("notify-1");
                 } else if (message.includes("Every second you waste, someone else gets stronger. Now get up, lock in, and do your damn duty!") ) {
                     audio = document.getElementById("notify-2");
@@ -514,11 +536,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     audio = document.getElementById("notify-3");
                 }else if (message.includes("So stand tall, focus up, and give it everything you've got. The battlefield rewards the brave — not the lazy!") ) {
                     audio = document.getElementById("notify-4");
-                } else if (message.includes("Discipline isn’t optional, soldier — it’s your lifeline.")) {
+                } else if (message.includes("Discipline isn't optional, soldier — it's your lifeline.")) {
                     audio = document.getElementById("notify-5");
                 }else if (message.includes("While you sit and wait, others are grinding, winning, rising.") ) {
                     audio = document.getElementById("notify-6");
-                } else if (message.includes("Hell no. It’s earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!")) {
+                } else if (message.includes("Hell no. It's earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!")) {
                     audio = document.getElementById("notify-7");
                 }
         
