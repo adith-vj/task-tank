@@ -237,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
             // Notify the user
             alert(`You earned ${coinsEarned} coins for working ${Math.floor(timeSpent / 60)} minutes!`);
+            enterTankLock.remove();
         }
         
         const surrenderButton = document.getElementById('surrender-btn');
