@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
         "THIS ISN'T NAPTIME! ENGAGE THAT BRAIN AND FINISH THE MISSION!"
     ];
     const notificationMessages = [
-        "Soldier! This isn't a vacation. You weren't built for comfort — you were made for greatness. Laziness is the enemy.",
+        "Soldier! This isn’t a vacation. You weren’t built for comfort — you were made for greatness. Laziness is the enemy.",
         "Every second you waste, someone else gets stronger. Now get up, lock in, and do your damn duty!",
         "You want results? Then earn them. Pain is temporary. Regret? That sticks forever.",
         "So stand tall, focus up, and give it everything you've got. The battlefield rewards the brave — not the lazy!",
-        "Discipline isn't optional, soldier — it's your lifeline.",
+        "Discipline isn’t optional, soldier — it’s your lifeline.",
         "While you sit and wait, others are grinding, winning, rising.",
-        "Hell no. It's earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!"
+        "Hell no. It’s earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!"
     ];
     
     // Sound setting
@@ -172,10 +172,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update focused task title
         document.querySelector('.focused-task-title').textContent = taskTitle;
 
-        // Generate and display subtasks
         generateSubtasks(taskTitle);
+        
 
         let tankLockStartTime = Date.now();
+
         
         // Show random timer (between 10-20 minutes)
         let minutes = Math.floor(Math.random() * 10) + 10;
@@ -184,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const timerElement = document.getElementById('countdown-timer');
         timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
-        const tankLockMode = document.getElementById('tank-lock-mode');
+        const tankLockMode = document.querySelector('.tank-lock-mode');
         // Show Tank Lock mode
         tankLockMode.classList.add('tank-lock-active');
 
@@ -194,22 +195,25 @@ document.addEventListener('DOMContentLoaded', function() {
         let countdown = setInterval(() => {
             if (seconds === 0) {
                 if (minutes === 0) {
-                    clearInterval(countdown);
-                    timerElement.textContent = "00:00";
+                    clearInterval(countdown); // Stop the timer
+                    timerElement.textContent = "00:00"; // Display "Time's up" message
+                    // Optionally trigger a task completion or alert
                     alert("Time's up! Tank Lock mode complete!");
                     return;
                 }
-                minutes--;
-                seconds = 59;
+                minutes--; // Decrease minutes
+                seconds = 59; // Reset seconds
             } else {
-                seconds--;
+                seconds--; // Decrease seconds
             }
+            // Update the timer display
             timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (Math.random() < 0.2) {
+            if (Math.random() < 0.2 && isnotificationdisplayed==true) { // ~20% chance per second
+                isnotificationdisplayed=false;
                 showNotification();
             }
-        }, 1000);
+        }, 1000); // Update every second
+    
         
         // Play random command
         if (soundEnabled) {
@@ -226,44 +230,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
         }
         
-        // Set up event listeners for Tank Lock controls
-        const exitLockBtn = document.getElementById('exit-lock-btn');
-        const completeBtn = document.getElementById('complete-btn');
-        const surrenderBtn = document.getElementById('surrender-btn');
+        function awardCoins() {
+            const timeSpent = Math.floor((Date.now() - tankLockStartTime) / 1000); // Time in seconds
+            const coinsEarned = Math.floor(timeSpent / 60); // 1 coin per minute
+            updateCoinBalance(coinsEarned);
         
-        exitLockBtn.addEventListener('click', () => {
-            clearInterval(countdown);
-            tankLockMode.classList.remove('tank-lock-active');
+            // Notify the user
+            alert(`You earned ${coinsEarned} coins for working ${Math.floor(timeSpent / 60)} minutes!`);
+            enterTankLock.remove();
+        }
+        
+        const surrenderButton = document.getElementById('surrender-btn');
+        const completeButton = document.getElementById('complete-btn');
+        const exitButton = document.getElementById('exit-lock-btn');
+        
+        surrenderButton.addEventListener('click', () => {
+            clearInterval(countdown); // Stop the countdown
+            tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
+            timerElement.textContent = "SURRENDERED"; // Optionally update timer text
             awardCoins();
         });
         
-        completeBtn.addEventListener('click', () => {
-            clearInterval(countdown);
-            tankLockMode.classList.remove('tank-lock-active');
+        completeButton.addEventListener('click', () => {
+            clearInterval(countdown); // Stop the countdown
+            tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
+            timerElement.textContent = "COMPLETED"; // Optionally update timer text
             awardCoins();
-            // Show explosion animation
-            explosionContainer.style.display = 'flex';
-            setTimeout(() => {
-                explosionContainer.style.display = 'none';
-            }, 1000);
         });
         
-        surrenderBtn.addEventListener('click', () => {
-            clearInterval(countdown);
-            tankLockMode.classList.remove('tank-lock-active');
-            // Add task to wreckage pile
-            const wreckageItems = document.querySelector('.wreckage-items');
-            const wreckageItem = document.createElement('div');
-            wreckageItem.className = 'wreckage-item';
-            wreckageItem.innerHTML = `
-                <span class="wreckage-task-title">${taskTitle}</span>
-                <button class="reclaim-btn">SALVAGE</button>
-            `;
-            wreckageItems.appendChild(wreckageItem);
+        exitButton.addEventListener('click', () => {
+            clearInterval(countdown); // Stop the countdown
+            tankLockMode.classList.remove('tank-lock-active'); // Exit Tank Lock mode
+            timerElement.textContent = "EXITED"; // Optionally update timer text
+            awardCoins();
         });
     }
-    
-    // Generate subtasks for a task
     function generateSubtasks(taskTitle) {
         // Get the subtasks container
         const subtasksList = document.getElementById('focused-subtasks');
@@ -528,7 +529,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (soundEnabled) {
                 let audio;
-                if (message.includes("Soldier! This isn't a vacation. You weren't built for comfort — you were made for greatness. Laziness is the enemy.") ) {
+                if (message.includes("Soldier! This isn’t a vacation. You weren’t built for comfort — you were made for greatness. Laziness is the enemy.") ) {
                     audio = document.getElementById("notify-1");
                 } else if (message.includes("Every second you waste, someone else gets stronger. Now get up, lock in, and do your damn duty!") ) {
                     audio = document.getElementById("notify-2");
@@ -536,11 +537,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     audio = document.getElementById("notify-3");
                 }else if (message.includes("So stand tall, focus up, and give it everything you've got. The battlefield rewards the brave — not the lazy!") ) {
                     audio = document.getElementById("notify-4");
-                } else if (message.includes("Discipline isn't optional, soldier — it's your lifeline.")) {
+                } else if (message.includes("Discipline isn’t optional, soldier — it’s your lifeline.")) {
                     audio = document.getElementById("notify-5");
                 }else if (message.includes("While you sit and wait, others are grinding, winning, rising.") ) {
                     audio = document.getElementById("notify-6");
-                } else if (message.includes("Hell no. It's earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!")) {
+                } else if (message.includes("Hell no. It’s earned in silence, in sweat, in struggle. So get off your back, tighten up, and MOVE!")) {
                     audio = document.getElementById("notify-7");
                 }
         
